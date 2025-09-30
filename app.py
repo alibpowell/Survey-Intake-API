@@ -46,21 +46,27 @@ def submit_survey():
     if not submission.submission_id:
         submission.submission_id = generate_submission_id(submission.email)
 
-    # Create StoredSurveyRecord with raw values (email/age still valid)
+    # Create StoredSurveyRecord with raw values
     record = StoredSurveyRecord(
         **submission.dict(),
         received_at=datetime.now(timezone.utc),
         ip=request.headers.get("X-Forwarded-For", request.remote_addr or "")
     )
 
-    # Hash PII only when saving to disk
-    append_json_line(record.hashed_record())
+    # Hash PII and include received_at and ip before saving
+    record_to_save = record.hashed_record()
+    record_to_save["received_at"] = record.received_at
+    record_to_save["ip"] = record.ip
+
+    append_json_line(record_to_save)
 
     return jsonify({"status": "ok", "submission_id": submission.submission_id}), 201
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=1234, debug=True)
+
+
 
 
 
