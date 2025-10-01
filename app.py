@@ -40,7 +40,10 @@ def submit_survey():
         # Validate raw submission
         submission = SurveySubmission(**payload)
     except ValidationError as ve:
-        return jsonify({"error": "validation_error", "detail": ve.errors()}), 422
+        return jsonify({
+            "error": "validation_error",
+            "detail": [str(err) for err in ve.errors()]
+        }), 422
 
     # Generate submission_id if missing
     if not submission.submission_id:
