@@ -35,4 +35,3 @@ class StoredSurveyRecord(BaseModel):
     submission_id: Optional[str]
     received_at: datetime
     ip: str
-    
